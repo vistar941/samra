@@ -83,9 +83,29 @@ struct RenditionInformationView: View {
 
 
         default:
-            Text("No Preview Available.")
-                .font(.title.italic())
-                .frame(width: 130, height: 230)
+            if let gradient = rendition.namedGradient {
+                Rectangle()
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(stops: gradient.stops.compactMap { stop in
+                                guard let nsColor = NSColor(cgColor: stop.color) else {
+                                    return nil
+                                }
+
+                                return Gradient.Stop(color: Color(nsColor), location: stop.location)
+                            }),
+                            startPoint: UnitPoint(x: gradient.startPoint.x, y: gradient.startPoint.y),
+                            endPoint: UnitPoint(x: gradient.endPoint.x, y: gradient.endPoint.y)
+                        )
+                    )
+                    .frame(width: 230, height: 230)
+                    .cornerRadius(12)
+                    .padding(20)
+            } else {
+                Text("No Preview Available.")
+                    .font(.title.italic())
+                    .frame(width: 130, height: 230)
+            }
         }
         
         HStack {

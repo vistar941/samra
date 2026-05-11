@@ -19,6 +19,8 @@ class RenditionCollectionViewItem: NSCollectionViewItem {
     }
     
     func configure(rendition: Rendition) {
+        resetContent()
+
         nameLabel = NSTextField(labelWithString: rendition.name)
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.maximumNumberOfLines = 0
@@ -97,7 +99,30 @@ class RenditionCollectionViewItem: NSCollectionViewItem {
             ])
 
         case nil:
-            representationPreview = .init()
+            if let gradient = rendition.namedGradient {
+                let gradientView = NSView()
+                gradientView.translatesAutoresizingMaskIntoConstraints = false
+                gradientView.wantsLayer = true
+
+                let gradientLayer = CAGradientLayer()
+                gradientLayer.colors = gradient.stops.map(\.color)
+                gradientLayer.locations = gradient.stops.map { NSNumber(value: Double($0.location)) }
+                gradientLayer.startPoint = gradient.startPoint
+                gradientLayer.endPoint = gradient.endPoint
+                gradientView.layer = gradientLayer
+
+                view.addSubview(gradientView)
+                NSLayoutConstraint.activate([
+                    gradientView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                    gradientView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -12.34),
+                    gradientView.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -20),
+                    gradientView.heightAnchor.constraint(equalTo: view.heightAnchor, constant: -34)
+                ])
+
+                representationPreview = gradientView
+            } else {
+                representationPreview = .init()
+            }
         }
         
         view.addSubview(nameLabel)
@@ -113,14 +138,21 @@ class RenditionCollectionViewItem: NSCollectionViewItem {
         layer.cornerCurve = .continuous
         layer.masksToBounds = true
         layer.borderColor = NSColor.systemGray.cgColor
+        layer.backgroundColor = NSColor.systemGray.withAlphaComponent(0.25).cgColor
+        view.wantsLayer = true
         view.layer = layer
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        
-        nameLabel.stringValue = ""
-        representationPreview.removeFromSuperview()
+
+        resetContent()
+    }
+
+    private func resetContent() {
+        view.subviews.forEach { $0.removeFromSuperview() }
+        view.removeConstraints(view.constraints)
         representationPreview = nil
+        nameLabel = nil
     }
 }

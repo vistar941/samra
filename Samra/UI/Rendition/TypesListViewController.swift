@@ -170,6 +170,8 @@ extension RenditionType {
         switch self {
         case .image, .svg:
             return "photo"
+        case .namedGradient:
+            return "paintpalette"
         case .icon:
             return "app"
         case .imageSet:
