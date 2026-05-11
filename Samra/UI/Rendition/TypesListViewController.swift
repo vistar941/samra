@@ -172,6 +172,8 @@ extension RenditionType {
             return "photo"
         case .namedGradient:
             return "paintpalette"
+        case .iconStack:
+            return "square.stack.3d.up"
         case .icon:
             return "app"
         case .imageSet:
