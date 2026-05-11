@@ -621,10 +621,10 @@
 /* Begin XCRemoteSwiftPackageReference section */
 		CE3F9C6C2CCA22C400662232 /* XCRemoteSwiftPackageReference "PrivateKits" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SerenaKit/PrivateKits";
+			repositoryURL = "https://github.com/vistar941/PrivateKits";
 			requirement = {
-				branch = main;
-				kind = branch;
+				kind = revision;
+				revision = f6e4a72e42f0ec13fb0027b2fae04b3530411acf;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

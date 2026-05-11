@@ -72,6 +72,28 @@ struct DetailItemSection: Hashable {
         var items: [DetailItemSection] = []
 
         switch rendition.type {
+        case .namedGradient:
+            items.append(DetailItemSection(sectionHeader: "Base Attributes", items: [
+                DetailItem(primaryText: "Rendition Name", secondaryText: cuiRend.name()),
+                DetailItem(primaryText: "Lookup Name", secondaryText: namedLookup.name),
+                sizeOnDisk,
+            ]))
+
+            if let gradient = rendition.namedGradient {
+                let stops = gradient.stops.enumerated().map { index, stop in
+                    DetailItem(
+                        primaryText: "Stop \(index + 1)",
+                        secondaryText: "\(Self.colorDescription(stop.color)) @ \(Self.percentDescription(stop.location))"
+                    )
+                }
+
+                items.append(DetailItemSection(sectionHeader: "Gradient Attributes", items: [
+                    DetailItem(primaryText: "Start Point", secondaryText: Self.pointDescription(gradient.startPoint)),
+                    DetailItem(primaryText: "End Point", secondaryText: Self.pointDescription(gradient.endPoint)),
+                    DetailItem(primaryText: "Stops", secondaryText: gradient.stops.count),
+                ] + stops))
+            }
+
         case .rawData:
             items.append(DetailItemSection(sectionHeader: "Base Attributes", items: [
                 DetailItem(primaryText: "Name", secondaryText: namedLookup.name),
@@ -106,6 +128,7 @@ struct DetailItemSection: Hashable {
                 DetailItem(primaryText: "Red", secondaryText: Int(red * 255)),
                 DetailItem(primaryText: "Green", secondaryText: Int(green * 255)),
                 DetailItem(primaryText: "Blue", secondaryText: Int(blue * 255)),
+                DetailItem(primaryText: "Alpha", secondaryText: "\(Int(alpha * 100))%"),
             ]))
 
         case .svg, .pdf:
@@ -155,5 +178,35 @@ struct DetailItemSection: Hashable {
         ]))
         
         return items
+    }
+
+    private static func pointDescription(_ point: CGPoint) -> String {
+        "\(Self.decimalDescription(point.x)), \(Self.decimalDescription(point.y))"
+    }
+
+    private static func percentDescription(_ value: CGFloat) -> String {
+        "\(Int((value * 100).rounded()))%"
+    }
+
+    private static func colorDescription(_ color: CGColor) -> String {
+        guard let nsColor = NSColor(cgColor: color)?.usingColorSpace(.deviceRGB) else {
+            return "Unknown Color"
+        }
+
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        nsColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+
+        return "R \(Int(red * 255)), G \(Int(green * 255)), B \(Int(blue * 255)), A \(Int(alpha * 100))%"
+    }
+
+    private static func decimalDescription(_ value: CGFloat) -> String {
+        let number = NSNumber(value: Double(value))
+        let formatter = NumberFormatter()
+        formatter.maximumFractionDigits = 3
+        formatter.minimumFractionDigits = 0
+        return formatter.string(from: number) ?? value.description
     }
 }
