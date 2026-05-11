@@ -623,8 +623,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/vistar941/PrivateKits";
 			requirement = {
-				kind = revision;
-				revision = ae9681f7c6325c569505f97435badbd020057dfd;
+				branch = main;
+				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
