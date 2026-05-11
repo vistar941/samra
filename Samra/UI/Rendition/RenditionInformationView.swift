@@ -101,6 +101,15 @@ struct RenditionInformationView: View {
                     .frame(width: 230, height: 230)
                     .cornerRadius(12)
                     .padding(20)
+            } else if let iconStack = rendition.iconStack {
+                VStack(spacing: 8) {
+                    Text("Icon Stack")
+                        .font(.title2)
+                    Text("\(Int(iconStack.size.width)) x \(Int(iconStack.size.height))")
+                    Text("\(iconStack.layers.count) layers")
+                }
+                .frame(width: 230, height: 230)
+                .padding(20)
             } else {
                 Text("No Preview Available.")
                     .font(.title.italic())

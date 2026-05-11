@@ -94,6 +94,33 @@ struct DetailItemSection: Hashable {
                 ] + stops))
             }
 
+        case .iconStack:
+            items.append(DetailItemSection(sectionHeader: "Base Attributes", items: [
+                DetailItem(primaryText: "Rendition Name", secondaryText: cuiRend.name()),
+                DetailItem(primaryText: "Lookup Name", secondaryText: namedLookup.name),
+                sizeOnDisk,
+            ]))
+
+            if let iconStack = rendition.iconStack {
+                items.append(DetailItemSection(sectionHeader: "Icon Stack Attributes", items: [
+                    DetailItem(primaryText: "Width", secondaryText: Self.decimalDescription(iconStack.size.width)),
+                    DetailItem(primaryText: "Height", secondaryText: Self.decimalDescription(iconStack.size.height)),
+                    DetailItem(primaryText: "Layers", secondaryText: iconStack.layers.count),
+                    DetailItem(primaryText: "Rendering Properties", secondaryText: iconStack.renderingProperties.count),
+                ]))
+
+                let layers = iconStack.layers.enumerated().map { index, layer in
+                    DetailItem(
+                        primaryText: "Layer \(index + 1)",
+                        secondaryText: Self.iconLayerDescription(layer)
+                    )
+                }
+
+                if !layers.isEmpty {
+                    items.append(DetailItemSection(sectionHeader: "Icon Stack Layers", items: layers))
+                }
+            }
+
         case .rawData:
             items.append(DetailItemSection(sectionHeader: "Base Attributes", items: [
                 DetailItem(primaryText: "Name", secondaryText: namedLookup.name),
@@ -200,6 +227,34 @@ struct DetailItemSection: Hashable {
         nsColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
 
         return "R \(Int(red * 255)), G \(Int(green * 255)), B \(Int(blue * 255)), A \(Int(alpha * 100))%"
+    }
+
+    private static func iconLayerDescription(_ layer: Rendition.IconStack.Layer) -> String {
+        switch layer {
+        case .gradient(let gradient):
+            return "Gradient, \(gradient.stops.count) stops, \(Self.pointDescription(gradient.startPoint)) -> \(Self.pointDescription(gradient.endPoint))"
+        case .group(let group):
+            let name = group.name.isEmpty ? "Group" : group.name
+            return "\(name), \(group.layers.count) layers, opacity \(Self.percentDescription(group.opacity)), blend \(group.blendMode), blur \(Self.decimalDescription(group.blurStrength)), \(Self.groupFillDescription(group))"
+        case .lookup(let name, let typeName):
+            return "\(name) (\(typeName))"
+        }
+    }
+
+    private static func groupFillDescription(_ group: Rendition.IconLayerGroup) -> String {
+        if let gradient = group.gradient {
+            return "gradient \(gradient.stops.count) stops"
+        }
+
+        if let color = group.color {
+            return Self.colorDescription(color)
+        }
+
+        if let name = group.gradientOrColorName, !name.isEmpty {
+            return name
+        }
+
+        return "no fill"
     }
 
     private static func decimalDescription(_ value: CGFloat) -> String {

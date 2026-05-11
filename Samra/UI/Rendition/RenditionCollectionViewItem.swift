@@ -120,6 +120,20 @@ class RenditionCollectionViewItem: NSCollectionViewItem {
                 ])
 
                 representationPreview = gradientView
+            } else if let iconStack = rendition.iconStack {
+                let textField = NSTextField(labelWithString: "Icon Stack\n\(Int(iconStack.size.width)) x \(Int(iconStack.size.height))\n\(iconStack.layers.count) layers")
+                textField.translatesAutoresizingMaskIntoConstraints = false
+                textField.alignment = .center
+                textField.maximumNumberOfLines = 3
+                textField.lineBreakMode = .byTruncatingTail
+                view.addSubview(textField)
+                representationPreview = textField
+                NSLayoutConstraint.activate([
+                    textField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                    textField.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -12.34),
+                    textField.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -20),
+                    textField.heightAnchor.constraint(equalTo: view.heightAnchor, constant: -34)
+                ])
             } else {
                 representationPreview = .init()
             }
